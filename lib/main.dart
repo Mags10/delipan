@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:delipan/utils/styles.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() {
+  // Preservar el splash screen hasta que la app esté lista
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  
+  // Inicializar la app
   runApp(const MyApp());
+  
+  // Quitar el splash screen cuando la app esté lista
+  FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatelessWidget {
@@ -12,10 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Delipan',
       debugShowCheckedModeBanner: false, // Quitar etiqueta de debug
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: AppStyles.appTheme,
       home: const MyHomePage(title: 'Delipan'),
     );
   }
@@ -35,21 +42,30 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               'delipan',
-              style: TextStyle(fontSize: 24),
+              style: AppStyles.appTitle,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Aplicación para panadería local',
-              style: TextStyle(fontSize: 16),
+              style: AppStyles.subtitle,
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text('Explorar productos'),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () {},
+              child: const Text('Iniciar sesión'),
             ),
           ],
         ),
