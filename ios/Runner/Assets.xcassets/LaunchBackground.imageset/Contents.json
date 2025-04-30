@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "LaunchImage.png",
+      "filename" : "background.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "LaunchImage@2x.png",
       "scale" : "2x"
     },
     {
-      "filename" : "LaunchImage@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
