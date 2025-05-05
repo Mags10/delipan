@@ -220,7 +220,7 @@ class _LoginState extends State<Login> {
                 child: TextButton(
                     onPressed: (){
                       setState(() {
-
+                        Navigator.of(context).pushReplacementNamed('/registro');
                       });
                     },
                     child: Text(
