@@ -9,6 +9,7 @@ class AppStyles {
   static const Color mediumBrown = Color(0xFFE4D1BF);
   static const Color lightBlue = Color(0xFFAAC4DB);
   static const Color darkGrey = Color(0xFF515151);
+  static const Color black = Color(0xFF000000);
 
   // Tamaños de fuente
   static const double titleFontSize = 26.0;

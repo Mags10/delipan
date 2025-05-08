@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:delipan/constantes.dart' as con;
+import 'package:delipan/utils/styles.dart' as con;
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: con.fondo1,
+      backgroundColor: con.AppStyles.secondaryBrown,
       body: Center(
         child: Container(
           child: Column(
