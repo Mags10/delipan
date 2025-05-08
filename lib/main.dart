@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:delipan/features/home/splash-screen.dart';
 import 'package:delipan/features/auth/login.dart';
 import 'package:delipan/config/styles.dart';
+import 'package:provider/provider.dart';
+import 'package:delipan/models/cart.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,17 +25,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Delipan',
-      debugShowCheckedModeBanner: false, // Quitar etiqueta de debug
-      theme: AppStyles.appTheme,
-      home: const SplashScreen(),
-      routes: {
-        '/login': (context) => const Login(),
-        '/home': (context) => const MyHomePage(title: 'Delipan'),
-        '/registro': (context) => const Registro(),
-        '/principal': (context) => const Principal()
-      },
+    return ChangeNotifierProvider(
+      create: (ctx) => Cart(),
+      child: MaterialApp(
+        title: 'Delipan',
+        debugShowCheckedModeBanner: false, // Quitar etiqueta de debug
+        theme: AppStyles.appTheme,
+        home: const SplashScreen(),
+        routes: {
+          '/login': (context) => const Login(),
+          '/home': (context) => const MyHomePage(title: 'Delipan'),
+          '/registro': (context) => const Registro(),
+          '/principal': (context) => const Principal()
+        },
+      ),
     );
   }
 }

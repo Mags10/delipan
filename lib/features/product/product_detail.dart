@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:delipan/models/product.dart';
 import 'package:delipan/config/styles.dart';
+import 'package:provider/provider.dart';
+import 'package:delipan/models/cart.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:delipan/features/cart/cart_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
@@ -111,6 +115,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> with SingleTicker
   }
 
   Widget _buildHeader() {
+    // Acceder al carrito para mostrar la cantidad de productos
+    final cart = Provider.of<Cart>(context);
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
       decoration: BoxDecoration(
@@ -151,9 +158,48 @@ class _ProductDetailPageState extends State<ProductDetailPage> with SingleTicker
             icon: const Icon(Icons.favorite_border, color: AppStyles.primaryBrown),
             onPressed: () {},
           ),
-          IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined, color: AppStyles.primaryBrown),
-            onPressed: () {},
+          // Icono del carrito con notificador
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_cart_outlined, color: AppStyles.primaryBrown),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      type: PageTransitionType.rightToLeft,
+                      child: CartPage(),
+                    ),
+                  );
+                },
+              ),
+              if (cart.itemCount > 0)
+                Positioned(
+                  top: 5,
+                  right: 5,
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '${cart.itemCount}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
@@ -362,10 +408,52 @@ class _ProductDetailPageState extends State<ProductDetailPage> with SingleTicker
           ),
         ),
         onPressed: () {
+          // Agregar el producto al carrito la cantidad de veces especificada
+          final cart = Provider.of<Cart>(context, listen: false);
+          
+          // Primero verificamos si el producto ya está en el carrito
+          bool isAlreadyInCart = cart.isInCart(product.id);
+          
+          // Añadimos el producto al carrito el número de veces especificado
+          for (int i = 0; i < quantity; i++) {
+            cart.addItem(product);
+          }
+          
+          // Mostramos diferentes mensajes dependiendo de si es un nuevo producto o uno existente
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${product.name} añadido al carrito'),
+              content: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      isAlreadyInCart 
+                        ? 'Se actualizó la cantidad de ${product.name}'
+                        : '${product.name} añadido al carrito',
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          type: PageTransitionType.rightToLeft,
+                          child: CartPage(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'VER CARRITO',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                ],
+              ),
               backgroundColor: AppStyles.primaryBrown,
+              duration: Duration(seconds: 2),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),

@@ -6,6 +6,9 @@ import 'package:delipan/widgets/product_card.dart';
 import 'package:delipan/data/dummy_data.dart';
 import 'package:delipan/features/product/product_detail.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
+import 'package:delipan/models/cart.dart';
+import 'package:delipan/features/cart/cart_page.dart';
 
 class Principal extends StatefulWidget {
   const Principal({super.key});
@@ -18,6 +21,50 @@ class _PrincipalState extends State<Principal> {
   // Obtener los productos de prueba
   final List<Product> featuredProducts = DummyData.getFeaturedProducts();
   final List<Product> moreProducts = DummyData.getMoreProducts();
+
+  // Variables para manejar la búsqueda
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  bool _isSearching = false;
+  List<Product> _searchResults = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Agregar listener al controlador de texto para actualizar la búsqueda
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    // Limpiar el controlador cuando se destruya el widget
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  // Método para manejar cambios en el campo de búsqueda
+  void _onSearchChanged() {
+    setState(() {
+      _searchQuery = _searchController.text;
+      _isSearching = _searchQuery.isNotEmpty;
+      if (_isSearching) {
+        _searchProducts();
+      }
+    });
+  }
+
+  // Método para buscar productos basados en la consulta
+  void _searchProducts() {
+    final query = _searchQuery.toLowerCase();
+    // Buscar en todos los productos (destacados y no destacados)
+    final allProducts = [...featuredProducts, ...moreProducts];
+    _searchResults = allProducts.where((product) {
+      return product.name.toLowerCase().contains(query) || 
+             product.description.toLowerCase().contains(query) ||
+             product.category.toLowerCase().contains(query);
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,15 +89,17 @@ class _PrincipalState extends State<Principal> {
                         right: 16.0,
                         bottom: 16.0,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 10), // Espacio adicional después de la barra
-                          _buildFeaturedProductsSection(),
-                          SizedBox(height: 20),
-                          _buildMoreProductsSection(),
-                        ],
-                      ),
+                      child: _isSearching 
+                          ? _buildSearchResultsSection()
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 10),
+                                _buildFeaturedProductsSection(),
+                                SizedBox(height: 20),
+                                _buildMoreProductsSection(),
+                              ],
+                            ),
                     ),
                   ),
                 ),
@@ -85,6 +134,8 @@ class _PrincipalState extends State<Principal> {
   }
 
   Widget _buildHeader() {
+    final cart = Provider.of<Cart>(context);
+    
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: BoxDecoration(
@@ -196,9 +247,48 @@ class _PrincipalState extends State<Principal> {
               ),
             ],
           ),
-          IconButton(
-            icon: Icon(Icons.shopping_cart_outlined, color: AppStyles.primaryBrown),
-            onPressed: () {},
+          // Icono del carrito con contador
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: Icon(Icons.shopping_cart_outlined, color: AppStyles.primaryBrown),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      type: PageTransitionType.rightToLeft,
+                      child: CartPage(),
+                    ),
+                  );
+                },
+              ),
+              if (cart.itemCount > 0)
+                Positioned(
+                  top: 5,
+                  right: 5,
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '${cart.itemCount}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
@@ -305,19 +395,207 @@ class _PrincipalState extends State<Principal> {
         ),
         padding: EdgeInsets.symmetric(horizontal: 10),
         child: TextField(
-          onChanged: (value) {
-            // Lógica para filtrar productos según la búsqueda
-            print('Buscando: $value');
-          },
+          controller: _searchController,
           decoration: InputDecoration(
             hintText: 'Buscar en el catálogo',
             border: InputBorder.none,
             icon: Icon(Icons.search, color: AppStyles.primaryBrown),
+            suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: Icon(Icons.clear, color: Colors.grey),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      _isSearching = false;
+                    });
+                  },
+                )
+              : null,
             contentPadding: EdgeInsets.symmetric(vertical: 12),
           ),
           style: TextStyle(fontSize: 16),
+          textInputAction: TextInputAction.search,
+          onSubmitted: (value) {
+            if (value.isNotEmpty) {
+              setState(() {
+                _searchQuery = value;
+                _isSearching = true;
+                _searchProducts();
+              });
+            }
+          },
         ),
       ),
+    );
+  }
+
+  // Widget para mostrar los resultados de búsqueda
+  Widget _buildSearchResultsSection() {
+    if (_searchResults.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 40),
+            Icon(
+              Icons.search_off,
+              size: 80,
+              color: AppStyles.primaryBrown.withOpacity(0.5),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'No se encontraron productos',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Intenta con otra palabra clave',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(bottom: 12.0),
+          child: Text(
+            'RESULTADOS DE BÚSQUEDA',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        Text(
+          'Se encontraron ${_searchResults.length} productos para "$_searchQuery"',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+        SizedBox(height: 16),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: _searchResults.length,
+          itemBuilder: (context, index) {
+            final product = _searchResults[index];
+            final heroTag = 'search-${product.id}';
+            
+            // Diseño especial para resultados de búsqueda
+            return Card(
+              elevation: 2,
+              margin: EdgeInsets.only(bottom: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => _navigateToProductDetail(context, product, heroTag),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Imagen del producto
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Hero(
+                          tag: heroTag,
+                          child: Image.network(
+                            product.imageUrl,
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 80,
+                                height: 80,
+                                color: Colors.grey[300],
+                                child: Icon(Icons.image_not_supported, color: Colors.grey[600]),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      // Información del producto
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product.name,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              product.description,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Categoría 
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: AppStyles.primaryBrown.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    product.category.toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppStyles.primaryBrown,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                // Precio
+                                Text(
+                                  '\$${product.price.toStringAsFixed(0)}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppStyles.primaryBrown,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
