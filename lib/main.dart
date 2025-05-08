@@ -1,10 +1,20 @@
-import 'package:delipan/principal.dart';
-import 'package:delipan/registro.dart';
+import 'package:delipan/features/home/principal.dart';
+import 'package:delipan/features/auth/registro.dart';
 import 'package:flutter/material.dart';
-import 'package:delipan/splash-screen.dart';
-import 'package:delipan/login.dart';
+import 'package:flutter/services.dart';
+import 'package:delipan/features/home/splash-screen.dart';
+import 'package:delipan/features/auth/login.dart';
+import 'package:delipan/config/styles.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Configurar UI del sistema a color negro
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    systemNavigationBarColor: Colors.black,
+    systemNavigationBarIconBrightness: Brightness.light,
+  ));
   runApp(const MyApp());
 }
 
@@ -16,10 +26,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Delipan',
       debugShowCheckedModeBanner: false, // Quitar etiqueta de debug
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: AppStyles.appTheme,
       home: const SplashScreen(),
       routes: {
         '/login': (context) => const Login(),

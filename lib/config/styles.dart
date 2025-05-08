@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 
 class AppStyles {
   // Colores principales
@@ -59,7 +60,7 @@ class AppStyles {
 
   // Estilos de botones
   static ButtonStyle primaryButtonStyle = ElevatedButton.styleFrom(
-    backgroundColor: primaryBrown,
+    backgroundColor: secondaryBrown,
     foregroundColor: Colors.white,
     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
     shape: RoundedRectangleBorder(
@@ -94,6 +95,12 @@ class AppStyles {
       centerTitle: true,
       elevation: 0,
       titleTextStyle: heading.copyWith(color: Colors.white),
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: Colors.black,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: primaryButtonStyle,

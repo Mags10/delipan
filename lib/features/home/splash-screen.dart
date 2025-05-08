@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:delipan/utils/styles.dart' as con;
+import 'package:delipan/config/styles.dart' as con;
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
