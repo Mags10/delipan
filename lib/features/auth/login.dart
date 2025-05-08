@@ -201,6 +201,7 @@ class _LoginState extends State<Login> {
                       onPressed: (){
                         setState(() {
                           // Código para registrarse
+                          Navigator.of(context).pushReplacementNamed('/registro');
                         });
                       },
                       child: Text(
