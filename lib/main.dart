@@ -8,10 +8,10 @@ import 'package:delipan/config/styles.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // Configurar UI del sistema a color negro
+  // Configurar UI del sistema para que los iconos sean visibles en fondos claros
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.dark, // Cambiado a dark para iconos visibles en fondo claro
     systemNavigationBarColor: Colors.black,
     systemNavigationBarIconBrightness: Brightness.light,
   ));

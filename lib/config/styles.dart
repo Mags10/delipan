@@ -97,7 +97,7 @@ class AppStyles {
       titleTextStyle: heading.copyWith(color: Colors.white),
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark, // Cambiado a dark para iconos visibles en fondo claro
         systemNavigationBarColor: Colors.black,
         systemNavigationBarIconBrightness: Brightness.light,
       ),
