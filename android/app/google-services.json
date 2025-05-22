@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "392102617861",
+    "project_id": "delipan-app",
+    "storage_bucket": "delipan-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392102617861:android:655247296e03e3fbfc4d6c",
+        "android_client_info": {
+          "package_name": "com.delipan.delipan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf0cos_00xh06-eaV2x82ZXDlOkHdWclI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

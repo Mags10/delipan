@@ -1,13 +1,25 @@
 import 'package:delipan/features/home/principal.dart';
 import 'package:delipan/features/auth/registro.dart';
+import 'package:delipan/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:delipan/features/home/splash-screen.dart';
 import 'package:delipan/features/auth/login.dart';
 import 'package:delipan/config/styles.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    runApp(MyApp());
+  } catch (e) {
+    print('Error inicializando Firebase: $e');
+  }
+
   // Configurar UI del sistema a color negro
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
