@@ -1,16 +1,18 @@
 import 'package:delipan/features/home/principal.dart';
 import 'package:delipan/features/auth/registro.dart';
+import 'package:delipan/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:delipan/features/home/splash-screen.dart';
 import 'package:delipan/features/auth/login.dart';
 import 'package:delipan/config/styles.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:delipan/models/cart.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  // Configurar UI del sistema para que los iconos sean visibles en fondos claros
+  // Configurar UI del sistema a color negro
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark, // Cambiado a dark para iconos visibles en fondo claro
