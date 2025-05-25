@@ -18,6 +18,7 @@ class AppStyles {
   static const double subtitleFontSize = 11.0;
   static const double textFontSize = 12.0;
   static const double headingFontSize = 22.0;
+  static const double buttonFontSize = 18.0;
 
   // Estilos de texto
   static TextStyle get appTitle => GoogleFonts.kaushanScript(
@@ -42,6 +43,12 @@ class AppStyles {
     fontSize: headingFontSize,
     fontWeight: FontWeight.bold,
     color: darkGrey,
+  );
+
+  static TextStyle get buttonText => GoogleFonts.inter(
+    fontSize: buttonFontSize,
+    fontWeight: FontWeight.w300,
+    color: lightBrown
   );
 
   // Decoraciones de InputField
