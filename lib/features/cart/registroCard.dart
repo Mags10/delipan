@@ -45,8 +45,7 @@ class _PagoState extends State<Pago> {
         ),
         leading: TextButton(
           onPressed: (){
-            ///Cambiar la dirección de la vista!!!
-            Navigator.of(context).pushReplacementNamed('/login');
+            Navigator.of(context).pushReplacementNamed('/pago');
           },
           child: Text(
             String.fromCharCode(Icons.arrow_back.codePoint),
@@ -64,8 +63,8 @@ class _PagoState extends State<Pago> {
       body: Center(
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: size.width * 0.06, vertical: size.height * 0.07),
-          width: size.width * 1.0,
-          height: size.height * 1.0,
+          width: size.width,
+          height: size.height,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -160,7 +159,7 @@ class _PagoState extends State<Pago> {
                         onPressed: (){},
                         style: AppStyles.primaryButtonStyle,
                         child: Text(
-                          'AGREGAR',
+                          'AGREGAR TARJETA',
                           style: AppStyles.buttonText.copyWith(
                             fontWeight: FontWeight.bold
                           )

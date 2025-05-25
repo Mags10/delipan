@@ -1,3 +1,4 @@
+import 'package:delipan/features/cart/metodo-pago.dart';
 import 'package:delipan/features/cart/registroCard.dart';
 import 'package:delipan/features/home/principal.dart';
 import 'package:delipan/features/auth/registro.dart';
@@ -46,7 +47,8 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const MyHomePage(title: 'Delipan'),
         '/registro': (context) => const Registro(),
         '/principal': (context) => const Principal(),
-        '/pago': (context) => const Pago()
+        '/pago': (context) => const MetodoPago(),
+        '/registraCard': (context) => const Pago(),
       },
     );
   }
