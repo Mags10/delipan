@@ -1,3 +1,5 @@
+import 'package:delipan/features/cart/metodo-pago.dart';
+import 'package:delipan/features/cart/registroCard.dart';
 import 'package:delipan/features/home/principal.dart';
 import 'package:delipan/features/auth/registro.dart';
 import 'package:delipan/firebase_options.dart';
