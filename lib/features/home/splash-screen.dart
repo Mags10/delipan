@@ -13,9 +13,16 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacementNamed('/login');
-    });
+    _checkAuthState();
+  }
+  void _checkAuthState() async {
+    // Esperamos un poco para mostrar el splash
+    await Future.delayed(const Duration(seconds: 2));
+    
+    if (!mounted) return;
+
+    // Navegamos al AuthWrapper que manejará el estado de autenticación
+    Navigator.of(context).pushReplacementNamed('/auth');
   }
 
 
