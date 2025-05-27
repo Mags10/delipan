@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:delipan/models/firebase_cart.dart';
 import 'package:delipan/config/styles.dart';
+import 'package:delipan/features/cart/metodo-pago.dart';
 
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
@@ -452,15 +453,10 @@ class CartPage extends StatelessWidget {
                                   flex: 2,
                                   child: ElevatedButton.icon(
                                     onPressed: cart.items.isNotEmpty ? () {
-                                      // Lógica para proceder al checkout
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text('Funcionalidad de checkout próximamente'),
-                                          backgroundColor: AppStyles.primaryBrown,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          behavior: SnackBarBehavior.floating,
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MetodoPago(),
                                         ),
                                       );
                                     } : null,

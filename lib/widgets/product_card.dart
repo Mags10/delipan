@@ -70,7 +70,7 @@ class _ProductCardState extends State<ProductCard> with SingleTickerProviderStat
                       widget.product.name,
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        fontSize: 13,
+                        fontSize: 15,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -83,7 +83,7 @@ class _ProductCardState extends State<ProductCard> with SingleTickerProviderStat
                             "\$${widget.product.price.toStringAsFixed(0)} mxn",
                             style: TextStyle(
                               color: AppStyles.primaryBrown,
-                              fontSize: 13,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

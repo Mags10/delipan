@@ -11,6 +11,10 @@ import 'package:delipan/models/firebase_cart.dart';
 import 'package:delipan/features/cart/cart_page.dart';
 import 'package:delipan/features/admin/admin_page.dart';
 import 'package:delipan/services/user_service.dart';
+import 'package:delipan/features/notifications/notifications_screen.dart';
+import 'package:delipan/services/notification_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:delipan/utils/auth_services.dart';
 
 class Principal extends StatefulWidget {
   const Principal({super.key});
@@ -23,15 +27,18 @@ class _PrincipalState extends State<Principal> {
   final ProductService _productService = ProductService();
   final TextEditingController _searchController = TextEditingController();
   final UserService _userService = UserService();
+  final NotificationService _notificationService = NotificationService();
+  final AuthService _authService = AuthService();
   String _searchQuery = '';
   bool _isSearching = false;
   bool _isAdmin = false;
-
+  int _unreadCount = 0;
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
     _checkAdminStatus();
+    _loadUnreadCount();
   }
 
   @override
@@ -49,11 +56,46 @@ class _PrincipalState extends State<Principal> {
 
   Future<void> _checkAdminStatus() async {
     final isAdmin = await _userService.isCurrentUserAdmin();
-    if (mounted) {
+    setState(() {
+      _isAdmin = isAdmin;
+    });
+  }
+  Future<void> _loadUnreadCount() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final count = await _notificationService.getUnreadCount(user.uid);
       setState(() {
-        _isAdmin = isAdmin;
+        _unreadCount = count;
       });
     }
+  }
+  Future<void> _signOut() async {
+    try {
+      await _authService.signOut();
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/auth');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al cerrar sesión: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _navigateToNotifications() {
+    Navigator.push(
+      context,
+      PageTransition(
+        type: PageTransitionType.rightToLeft,
+        child: NotificationsScreen(),
+      ),
+    ).then((_) {
+      // Recargar el conteo cuando se regrese de la pantalla de notificaciones
+      _loadUnreadCount();
+    });
   }
 
   @override
@@ -145,8 +187,7 @@ class _PrincipalState extends State<Principal> {
           Spacer(),
           PopupMenuButton<String>(
             icon: Icon(Icons.person_outline, color: AppStyles.primaryBrown),
-            offset: Offset(0, 50),
-            onSelected: (value) {
+            offset: Offset(0, 50),            onSelected: (value) {
               switch (value) {
                 case 'mi_cuenta':
                   print('Navegando a Mi Cuenta');
@@ -161,22 +202,12 @@ class _PrincipalState extends State<Principal> {
                   );
                   break;
                 case 'cerrar_sesion':
-                  print('Cerrando sesión');
-                  Navigator.pushReplacementNamed(context, '/login');
+                  _signOut();
                   break;
               }
-            },            itemBuilder: (BuildContext context) {
+            },itemBuilder: (BuildContext context) {
               List<PopupMenuItem<String>> items = [
-                PopupMenuItem<String>(
-                  value: 'mi_cuenta',
-                  child: Row(
-                    children: [
-                      Icon(Icons.account_circle, color: AppStyles.primaryBrown),
-                      SizedBox(width: 10),
-                      Text('Mi Cuenta', style: AppStyles.bodyText),
-                    ],
-                  ),
-                ),
+                
               ];
 
               // Agregar opción de admin solo si el usuario es administrador
@@ -209,42 +240,39 @@ class _PrincipalState extends State<Principal> {
               );
 
               return items;
-            },
-          ),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.notifications_none, color: AppStyles.primaryBrown),
-            offset: Offset(0, 50),
-            onSelected: (value) {
-              switch (value) {
-                case 'todas_notificaciones':
-                  print('Ver todas las notificaciones');
-                  break;
-                case 'configurar_notificaciones':
-                  print('Configurar notificaciones');
-                  break;
-              }
-            },
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                value: 'todas_notificaciones',
-                child: Row(
-                  children: [
-                    Icon(Icons.notifications, color: AppStyles.primaryBrown),
-                    SizedBox(width: 10),
-                    Text('Todas las notificaciones', style: AppStyles.bodyText),
-                  ],
-                ),
+            },          ),
+          // Botón de notificaciones con badge
+          Stack(
+            children: [
+              IconButton(
+                icon: Icon(Icons.notifications_none, color: AppStyles.primaryBrown),
+                onPressed: _navigateToNotifications,
               ),
-              PopupMenuItem<String>(
-                value: 'configurar_notificaciones',
-                child: Row(
-                  children: [
-                    Icon(Icons.settings, color: AppStyles.primaryBrown),
-                    SizedBox(width: 10),
-                    Text('Configurar notificaciones', style: AppStyles.bodyText),
-                  ],
+              if (_unreadCount > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '$_unreadCount',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ),
-              ),
             ],
           ),
           Consumer<FirebaseCart>(

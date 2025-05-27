@@ -68,8 +68,7 @@ class AuthService {
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       debugPrint('Error de autentificación: ${e.code} - ${e.message}');
-      rethrow;
-    } on FirebaseException catch (e) {
+      rethrow;    } on FirebaseException catch (e) {
       debugPrint('Error de Firestore: ${e.code} - ${e.message}');
       throw FirebaseAuthException(
           code: 'firestore-error',
@@ -96,11 +95,12 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    try {
-      final userCredential = await _auth.createUserWithEmailAndPassword(
+    try {      final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
-      );      await _firestore.collection('usuarios').doc(userCredential.user!.uid).set({
+      );
+      
+      await _firestore.collection('usuarios').doc(userCredential.user!.uid).set({
         'username': username,
         'email': email,
         'rol': 'user', // Por defecto todos los usuarios tienen rol 'user'
@@ -118,5 +118,21 @@ class AuthService {
         message: 'Error al registrar usuario',
       );
     }
+  }
+
+  /// Método para cerrar sesión
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+      debugPrint('Sesión cerrada exitosamente');
+    } catch (e) {
+      debugPrint('Error al cerrar sesión: $e');
+      throw Exception('Error al cerrar sesión');
+    }
+  }
+
+  /// Verificar si el usuario está autenticado
+  bool isUserAuthenticated() {
+    return _auth.currentUser != null;
   }
 }

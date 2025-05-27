@@ -38,7 +38,7 @@ class FeaturedProductCard extends StatelessWidget {
                       product.name,
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        fontSize: 14,
+                        fontSize: 18,
                       ),
                     ),
                     SizedBox(height: 4),
@@ -46,7 +46,7 @@ class FeaturedProductCard extends StatelessWidget {
                       "\$${product.price.toStringAsFixed(0)} mxn",
                       style: TextStyle(
                         color: AppStyles.primaryBrown,
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -57,7 +57,7 @@ class FeaturedProductCard extends StatelessWidget {
                           product.description,
                           style: TextStyle(
                             color: Colors.black54,
-                            fontSize: 11,
+                            fontSize: 13,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,

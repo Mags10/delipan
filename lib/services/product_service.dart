@@ -6,17 +6,23 @@ class ProductService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Colección de productos en Firestore
-  CollectionReference get _productsCollection => _firestore.collection('products');
-
-  // Obtener todos los productos
+  CollectionReference get _productsCollection => _firestore.collection('products');  // Obtener todos los productos
   Stream<List<Product>> getProducts() {
     return _productsCollection
         .where('isActive', isEqualTo: true)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Product.fromFirestore(doc))
-            .toList());
+        .map((snapshot) {
+          var products = snapshot.docs
+              .map((doc) => Product.fromFirestore(doc))
+              .toList();
+          // Ordenar en el cliente por fecha de creación (manejo seguro de nulos)
+          products.sort((a, b) {
+            final aDate = a.createdAt ?? DateTime.now();
+            final bDate = b.createdAt ?? DateTime.now();
+            return bDate.compareTo(aDate);
+          });
+          return products;
+        });
   }
 
   // Stream para productos destacados
@@ -27,9 +33,8 @@ class ProductService {
         .where('isActive', isEqualTo: true)
         .where('isFeatured', isEqualTo: true) // Cambiar a true para productos destacados
         // Quitar el .orderBy('name') para evitar el índice compuesto
-        .snapshots()
-        .map((snapshot) {
-          var products = snapshot.docs.map((doc) => Product.fromMap(doc.data(), doc.id)).toList();
+        .snapshots()        .map((snapshot) {
+          var products = snapshot.docs.map((doc) => Product.fromFirestore(doc)).toList();
           // Ordenar en el cliente
           products.sort((a, b) => a.name.compareTo(b.name));
           return products;
@@ -48,9 +53,8 @@ class ProductService {
       query = query.startAfterDocument(lastDocument);
     }
 
-    return query.snapshots().map((snapshot) {
-      List<Product> products = snapshot.docs
-          .map((doc) => Product.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+    return query.snapshots().map((snapshot) {      List<Product> products = snapshot.docs
+          .map((doc) => Product.fromFirestore(doc))
           .where((product) => product.isFeatured == false)
           .toList();
       
@@ -70,9 +74,8 @@ class ProductService {
         .where('isActive', isEqualTo: true)
         .snapshots()
         .map((snapshot) {
-          String searchTerm = query.toLowerCase();
-          List<Product> products = snapshot.docs
-              .map((doc) => Product.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+          String searchTerm = query.toLowerCase();          List<Product> products = snapshot.docs
+              .map((doc) => Product.fromFirestore(doc))
               .where((product) {
                 return product.name.toLowerCase().contains(searchTerm) ||
                       product.description.toLowerCase().contains(searchTerm) ||

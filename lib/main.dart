@@ -2,6 +2,7 @@ import 'package:delipan/features/cart/metodo-pago.dart';
 import 'package:delipan/features/cart/registroCard.dart';
 import 'package:delipan/features/home/principal.dart';
 import 'package:delipan/features/auth/registro.dart';
+import 'package:delipan/features/auth/auth_wrapper.dart';
 import 'package:delipan/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -44,12 +45,12 @@ class MyApp extends StatelessWidget {
         title: 'Delipan',
         debugShowCheckedModeBanner: false, // Quitar etiqueta de debug
         theme: AppStyles.appTheme,
-        home: const SplashScreen(),
-        routes: {
+        home: const SplashScreen(),        routes: {
           '/login': (context) => const Login(),
           '/home': (context) => const MyHomePage(title: 'Delipan'),
           '/registro': (context) => const Registro(),
-          '/principal': (context) => const Principal()
+          '/principal': (context) => const Principal(),
+          '/auth': (context) => const AuthWrapper(),
         },
       ),
     );

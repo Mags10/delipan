@@ -1,9 +1,8 @@
 import 'package:delipan/config/styles.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:delipan/services/card_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class Pago extends StatefulWidget {
   const Pago({super.key});
@@ -20,166 +19,192 @@ class _PagoState extends State<Pago> {
   bool isCvvFocused = false;
   bool useGlassMorphis = false;
   bool useFloatingAnimation = true;
-  final OutlineInputBorder border = OutlineInputBorder(
-    borderSide: BorderSide(
-      color: AppStyles.darkGrey.withOpacity(0.7),
-      width: 2.0,
-    ),
-  );
+  bool isLoading = false;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppStyles.secondaryBrown,
-        title: Text(
-            'Agrega una tarjeta',
-            style: GoogleFonts.inter(
-            fontSize: AppStyles.headingFontSize,
-            color: AppStyles.lightBrown,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: TextButton(
-          onPressed: (){
-            Navigator.of(context).pushReplacementNamed('/pago');
-          },
-          child: Text(
-            String.fromCharCode(Icons.arrow_back.codePoint),
-            style: TextStyle(
-                inherit: false,
-                fontSize: 32,
-                fontWeight: FontWeight.w900,
-                fontFamily: Icons.arrow_back.fontFamily,
-                color: AppStyles.lightBrown
+      backgroundColor: AppStyles.lightBrown,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header consistente con CartPage
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              decoration: BoxDecoration(
+                color: AppStyles.lightBrown,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 2,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios, color: AppStyles.primaryBrown),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  SizedBox(width: 8),
+                  CircleAvatar(
+                    backgroundColor: AppStyles.primaryBrown,
+                    radius: 16,
+                    child: Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Image.asset(
+                        'assets/Logo_delipan.png',
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Agregar Tarjeta',
+                    style: AppStyles.appTitle.copyWith(fontSize: 28),
+                  ),
+                  Spacer(),
+                  Icon(Icons.credit_card, color: AppStyles.primaryBrown),
+                ],
+              ),
             ),
-          ),
-        ),
-      ),
-      resizeToAvoidBottomInset: false,
-      body: Center(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: size.width * 0.06, vertical: size.height * 0.07),
-          width: size.width,
-          height: size.height,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppStyles.lightBrown,
-                AppStyles.lightBrown,
-                AppStyles.lightBrown,
-                AppStyles.secondaryBrown.withOpacity(0.3),
-              ],
-            ),
-          ),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: size.width * 0.001, vertical: size.height * 0.03),
-            width: size.width * 0.85,
-            constraints: BoxConstraints(maxWidth: 450), // Limitamos el ancho máximo
-            decoration: BoxDecoration(
-              color: AppStyles.mediumBrown,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: AppStyles.black.withOpacity(0.4),
-                  blurRadius: 15.0,
-                  spreadRadius: 1.0,
-                  offset: Offset(0.0, 10.0),
-                ),
-              ],
-            ),
-            child: SafeArea(
+            
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(16),
                 child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
+                  children: [
+                    // Widget de la tarjeta de crédito
                     CreditCardWidget(
                       enableFloatingCard: useFloatingAnimation,
-                        glassmorphismConfig: _getGlassmorphismConfig(),
-                        cardNumber: cardNumber,
-                        expiryDate: expiryDate,
-                        cardHolderName: cardHolderName,
-                        cvvCode: cvvCode,
-                        bankName: 'DeliBank',
-                        frontCardBorder: useGlassMorphis ? null : Border.all(color: AppStyles.lightBlue),
-                        backCardBorder: useGlassMorphis ? null : Border.all(color: AppStyles.lightBlue),
-                        showBackView: isCvvFocused,
-                        obscureCardNumber: true,
-                        obscureCardCvv: true,
-                        isHolderNameVisible: true,
-                        cardBgColor: AppStyles.lightBlue,
-                        isSwipeGestureEnabled: true,
-                        onCreditCardWidgetChange: (CreditCardBrand creditCardBrand) {},
+                      glassmorphismConfig: _getGlassmorphismConfig(),
+                      cardNumber: cardNumber,
+                      expiryDate: expiryDate,
+                      cardHolderName: cardHolderName,
+                      cvvCode: cvvCode,
+                      bankName: 'DeliBank',
+                      frontCardBorder: useGlassMorphis ? null : Border.all(color: AppStyles.primaryBrown, width: 2),
+                      backCardBorder: useGlassMorphis ? null : Border.all(color: AppStyles.primaryBrown, width: 2),
+                      showBackView: isCvvFocused,
+                      obscureCardNumber: true,
+                      obscureCardCvv: true,                      isHolderNameVisible: true,
+                      cardBgColor: AppStyles.primaryBrown,
+                      isSwipeGestureEnabled: true,
+                      onCreditCardWidgetChange: (CreditCardBrand creditCardBrand) {},
+                      customCardTypeIcons: <CustomCardTypeIcon>[],
                     ),
+                    
+                    SizedBox(height: 24),
+                    
+                    // Formulario de la tarjeta
                     Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
                         child: SingleChildScrollView(
-                          child: Column(
-                            children: <Widget>[
-                              CreditCardForm(
-                                formKey: formKey,
-                                obscureCvv: true,
-                                obscureNumber: true,
-                                cardNumber: cardNumber,
-                                cvvCode: cvvCode,
-                                isHolderNameVisible: true,
-                                isCardNumberVisible: true,
-                                isExpiryDateVisible: true,
-                                cardHolderName: cardHolderName,
-                                expiryDate: expiryDate,
-                                inputConfiguration: InputConfiguration(
-                                  cardNumberDecoration: AppStyles.inputDecoration('').copyWith(
-                                    labelText: 'Número de la tarjeta',
-                                    hintText: 'XXXX XXXX XXXX XXXX',
-                                  ),
-                                  expiryDateDecoration: AppStyles.inputDecoration('').copyWith(
-                                    labelText: 'Vencimiento',
-                                    hintText: 'MM/AA',
-                                  ),
-                                  cvvCodeDecoration: AppStyles.inputDecoration('').copyWith(
-                                    labelText: 'CVV',
-                                    hintText: 'CVV',
-                                  ),
-                                  cardHolderDecoration: AppStyles.inputDecoration('').copyWith(
-                                    labelText: 'Nombre del titular',
-                                    hintText: 'Nombre de la tarjeta',
-                                  ),
-                                ), onCreditCardModelChange: onCreditCardModelChange,
+                          child: CreditCardForm(
+                            formKey: formKey,
+                            obscureCvv: true,
+                            obscureNumber: true,
+                            cardNumber: cardNumber,
+                            cvvCode: cvvCode,
+                            isHolderNameVisible: true,
+                            isCardNumberVisible: true,
+                            isExpiryDateVisible: true,
+                            cardHolderName: cardHolderName,
+                            expiryDate: expiryDate,
+                            onCreditCardModelChange: onCreditCardModelChange,
+                            inputConfiguration: InputConfiguration(
+                              cardNumberDecoration: AppStyles.inputDecoration('Número de tarjeta').copyWith(
+                                hintText: 'XXXX XXXX XXXX XXXX',
+                                prefixIcon: Icon(Icons.credit_card, color: AppStyles.primaryBrown),
                               ),
-                            ],
+                              expiryDateDecoration: AppStyles.inputDecoration('Fecha de vencimiento').copyWith(
+                                hintText: 'MM/AA',
+                                prefixIcon: Icon(Icons.calendar_today, color: AppStyles.primaryBrown),
+                              ),
+                              cvvCodeDecoration: AppStyles.inputDecoration('CVV').copyWith(
+                                hintText: 'XXX',
+                                prefixIcon: Icon(Icons.lock, color: AppStyles.primaryBrown),
+                              ),
+                              cardHolderDecoration: AppStyles.inputDecoration('Nombre del titular').copyWith(
+                                hintText: 'Como aparece en la tarjeta',
+                                prefixIcon: Icon(Icons.person, color: AppStyles.primaryBrown),
+                              ),
+                              cardNumberTextStyle: AppStyles.bodyText,
+                              expiryDateTextStyle: AppStyles.bodyText,
+                              cvvCodeTextStyle: AppStyles.bodyText,
+                              cardHolderTextStyle: AppStyles.bodyText,
+                            ),
                           ),
-                        )
-                    ),
-                    Center(
-                      child: TextButton(
-                        onPressed: (){},
-                        style: AppStyles.primaryButtonStyle,
-                        child: Text(
-                          'AGREGAR TARJETA',
-                          style: AppStyles.buttonText.copyWith(
-                            fontWeight: FontWeight.bold
-                          )
                         ),
                       ),
                     ),
                   ],
-                )
+                ),
+              ),
             ),
-          ),
+            
+            // Botón de agregar tarjeta
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : _agregarTarjeta,
+                  style: AppStyles.primaryButtonStyle.copyWith(
+                    padding: MaterialStateProperty.all(
+                      EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
+                  child: isLoading
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          'AGREGAR TARJETA',
+                          style: AppStyles.buttonText.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
-  }
-  void _onValidate() {
-    if (formKey.currentState?.validate() ?? false) {
-      print('valid!');
-    } else {
-      print('invalid!');
-    }
   }
 
   Glassmorphism? _getGlassmorphismConfig() {
@@ -187,11 +212,18 @@ class _PagoState extends State<Pago> {
       return null;
     }
 
-    final LinearGradient gradient = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: <Color>[AppStyles.darkGrey.withAlpha(50), Colors.grey.withAlpha(50)],
-      stops: const <double>[0.3, 0],
+    return Glassmorphism(
+      blurX: 8.0,
+      blurY: 16.0,
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: <Color>[
+          AppStyles.darkGrey.withAlpha(50), 
+          Colors.grey.withAlpha(50)
+        ],
+        stops: const <double>[0.3, 0],
+      ),
     );
   }
 
@@ -203,5 +235,101 @@ class _PagoState extends State<Pago> {
       cvvCode = creditCardModel.cvvCode;
       isCvvFocused = creditCardModel.isCvvFocused;
     });
+  }
+
+  Future<void> _agregarTarjeta() async {
+    if (!_validarFormulario()) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        _mostrarError('Usuario no autenticado');
+        return;
+      }
+
+      final cardData = {
+        'cardNumber': cardNumber,
+        'cardHolderName': cardHolderName,
+        'expiryDate': expiryDate,
+        'cvvCode': cvvCode,
+      };
+
+      final success = await CardService.saveCard(user.uid, cardData);
+
+      if (success) {
+        // Retornar los datos de la tarjeta agregada
+        Navigator.pop(context, {
+          'id': DateTime.now().millisecondsSinceEpoch.toString(),
+          'cardNumber': cardNumber,
+          'cardHolderName': cardHolderName,
+          'expiryDate': expiryDate,
+          'last4': cardNumber.replaceAll(' ', '').substring(cardNumber.replaceAll(' ', '').length - 4),
+          'type': _getCardType(cardNumber),
+        });
+      } else {
+        _mostrarError('Error al guardar la tarjeta');
+      }
+    } catch (e) {
+      _mostrarError('Error inesperado: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  bool _validarFormulario() {
+    if (cardNumber.isEmpty || cardNumber.length < 13) {
+      _mostrarError('Ingresa un número de tarjeta válido');
+      return false;
+    }
+
+    if (cardHolderName.isEmpty || cardHolderName.length < 2) {
+      _mostrarError('Ingresa el nombre del titular');
+      return false;
+    }
+
+    if (!CardService.isValidExpiryDate(expiryDate)) {
+      _mostrarError('Ingresa una fecha de vencimiento válida');
+      return false;
+    }
+
+    if (cvvCode.isEmpty || cvvCode.length < 3) {
+      _mostrarError('Ingresa un CVV válido');
+      return false;
+    }
+
+    return true;
+  }
+
+  String _getCardType(String cardNumber) {
+    final number = cardNumber.replaceAll(' ', '');
+    
+    if (number.startsWith('4')) {
+      return 'Visa';
+    } else if (number.startsWith('5') || number.startsWith('2')) {
+      return 'Mastercard';
+    } else if (number.startsWith('3')) {
+      return 'American Express';
+    } else {
+      return 'Tarjeta';
+    }
+  }
+
+  void _mostrarError(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
   }
 }

@@ -35,9 +35,7 @@ class _LoginState extends State<Login> {
       final user = await _authService.loginWithUsernameAndPassword(
           username: _usernameController.text,
           password: _passwordController.text,
-      );
-
-      if (user != null) {
+      );      if (user != null) {
         Navigator.pushReplacementNamed(context, '/principal');
       }
     } on FirebaseAuthException catch (e) {

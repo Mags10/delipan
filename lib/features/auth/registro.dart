@@ -50,10 +50,8 @@ class _RegistroState extends State<Registro> {
         username: this.user.text.trim(),
         email: email.text.trim(),
         password: pass.text.trim(),
-      );
-
-      if (user != null && mounted) {
-        Navigator.pushReplacementNamed(context, '/login');
+      );      if (user != null && mounted) {
+        Navigator.pushReplacementNamed(context, '/auth');
       }
     } on FirebaseAuthException catch (e) {
       setState(() {

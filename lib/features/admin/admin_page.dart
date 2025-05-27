@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:delipan/config/styles.dart';
 import 'package:delipan/services/user_service.dart';
+import 'package:delipan/features/admin/admin_pickup_points_page.dart';
+import 'package:delipan/features/admin/admin_products_page.dart';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});
@@ -355,8 +357,7 @@ class _AdminPageState extends State<AdminPage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 24),
-                    // Tarjeta de gestión de base de datos
+                    SizedBox(height: 24),                    // Tarjeta de gestión de productos
                     Container(
                       padding: EdgeInsets.all(20),
                       decoration: BoxDecoration(
@@ -382,14 +383,14 @@ class _AdminPageState extends State<AdminPage> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
-                                  Icons.storage,
+                                  Icons.inventory,
                                   color: Colors.blue,
                                   size: 24,
                                 ),
                               ),
                               SizedBox(width: 16),
                               Text(
-                                'Gestión de Base de Datos',
+                                'Gestión de Productos',
                                 style: TextStyle(
                                   fontSize: AppStyles.cardTitleFontSize,
                                   fontWeight: FontWeight.bold,
@@ -400,7 +401,7 @@ class _AdminPageState extends State<AdminPage> {
                           ),
                           SizedBox(height: 16),
                           Text(
-                            'Popula la base de datos de Firebase con productos y categorías de muestra para comenzar a usar la aplicación.',
+                            'Administra el catálogo de productos de tu panadería. Agrega, edita o elimina productos con imágenes automáticas de Unsplash.',
                             style: AppStyles.bodyText.copyWith(
                               color: Colors.grey[600],
                             ),
@@ -410,11 +411,9 @@ class _AdminPageState extends State<AdminPage> {
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
-                                // TODO: Implementar funcionalidad
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Funcionalidad en desarrollo'),
-                                    backgroundColor: AppStyles.primaryBrown,
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => AdminProductsPage(),
                                   ),
                                 );
                               },
@@ -427,7 +426,84 @@ class _AdminPageState extends State<AdminPage> {
                                 ),
                               ),
                               child: Text(
-                                'Inicializar Base de Datos',
+                                'Gestionar Productos',
+                                style: TextStyle(fontSize: AppStyles.buttonFontSize),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),                    ),
+                    SizedBox(height: 24),
+                    // Tarjeta de gestión de puntos de recogida
+                    Container(
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.location_on,
+                                  color: Colors.orange,
+                                  size: 24,
+                                ),
+                              ),
+                              SizedBox(width: 16),
+                              Text(
+                                'Gestión de Puntos de Recogida',
+                                style: TextStyle(
+                                  fontSize: AppStyles.cardTitleFontSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppStyles.primaryBrown,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'Administra las ubicaciones donde los clientes pueden recoger sus pedidos. Puedes agregar, editar o eliminar puntos de recogida.',
+                            style: AppStyles.bodyText.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Container(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => AdminPickupPointsPage(),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'Gestionar Puntos de Recogida',
                                 style: TextStyle(fontSize: AppStyles.buttonFontSize),
                               ),
                             ),
