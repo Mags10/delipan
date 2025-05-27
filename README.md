@@ -2,6 +2,11 @@
 
 Aplicación móvil desarrollada como proyecto educativo para la materia **Fundamentos de Desarrollo Móvil**.
 
+## 📚 Documentación
+
+- **📖 [Manual de Usuario](doc/ManualUsuario.pdf)** - Guía básica de uso de la aplicación
+- **🎨 [Mockups](doc/Mockups%20delipan.pdf)** - Maquetado inicial del proyecto (Figma).
+
 ## Información Académica
 
 - **Materia:** 223902 - Fundamentos de Desarrollo Móvil
@@ -16,6 +21,26 @@ Aplicación móvil desarrollada como proyecto educativo para la materia **Fundam
 ## Descripción del Proyecto
 
 Delipan es una aplicación móvil desarrollada en Flutter como parte del proyecto final de la materia FDM. Es una aplicación de panadería que permite a los usuarios explorar productos, gestionar un carrito de compras, seleccionar puntos de recogida y realizar pedidos. La aplicación incluye funcionalidades de autenticación, gestión de roles (usuario/administrador) y sincronización en tiempo real con Firebase.
+
+## 📱 Capturas de Pantalla
+
+### Pantallas de Usuario
+
+<div align="center">
+
+| Inicio de Sesión | Pantalla Principal | Carrito de Compras |
+|:----------------:|:------------------:|:------------------:|
+| ![Login](doc/images/login.png) | ![Home](doc/images/home.png) | ![Carrito](doc/images/carrito.png) |
+
+| Mapa de Puntos | Proceso de Pago | Confirmación |
+|:--------------:|:---------------:|:------------:|
+| ![Mapa](doc/images/mapa.png) | ![Pago](doc/images/pago.png) | ![Confirmación](doc/images/confirmacion.png) |
+
+| Notificaciones | Panel de Admin |
+|:--------------:|:--------------:|
+| ![Notificaciones](doc/images/notificaciones.png) | ![Admin](doc/images/admin.png) |
+
+</div>
 
 ## Estructura del Proyecto
 
