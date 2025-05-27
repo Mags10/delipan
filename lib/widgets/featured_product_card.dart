@@ -8,11 +8,11 @@ class FeaturedProductCard extends StatelessWidget {
   final String heroTag;
 
   const FeaturedProductCard({
-    Key? key,
+    super.key,
     required this.product,
     this.onTap,
     this.heroTag = '',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

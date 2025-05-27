@@ -100,19 +100,18 @@ class AuthService {
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
-      );
-
-      await _firestore.collection('usuarios').doc(userCredential.user!.uid).set({
+      );      await _firestore.collection('usuarios').doc(userCredential.user!.uid).set({
         'username': username,
         'email': email,
+        'rol': 'user', // Por defecto todos los usuarios tienen rol 'user'
         'createAt': FieldValue.serverTimestamp(),
       });
 
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       debugPrint('Error de registro: ${e.code} - ${e.message}');
-      throw e;
-    } cath (e) {
+      rethrow;
+    } catch (e) {
       debugPrint('Error inesperado al registrar $e');
       throw FirebaseAuthException(
         code: 'registration-failed',

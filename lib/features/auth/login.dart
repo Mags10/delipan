@@ -3,9 +3,6 @@ import 'package:delipan/utils/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:delipan/config/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:delipan/features/auth/registro.dart';
-import 'package:delipan/features/home/principal.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -15,21 +12,79 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final user = TextEditingController();
-  final pass = TextEditingController();
-  bool checkUser = false;
-  bool checkPass = false;
-  bool ocultaPass = true;
+  final AuthService _authService = AuthService();
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _ocultaTexto = true;
+  bool _isLoading = false;
+  String? _usernameError;
+  String? _passwordError;
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
-      checkUser = user.text != 'admin' || user.text.isEmpty;
-      checkPass = pass.text != '123' || pass.text.isEmpty;
-      
-      if (!checkUser && !checkPass){
-        Navigator.of(context).pushReplacementNamed('/principal');
+      _isLoading = true;
+      _usernameError = null;
+      _passwordError = null;
+    });
+
+    try {
+      final user = await _authService.loginWithUsernameAndPassword(
+          username: _usernameController.text,
+          password: _passwordController.text,
+      );
+
+      if (user != null) {
+        Navigator.pushReplacementNamed(context, '/principal');
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      _handleAuthError(e);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _usernameError = 'Error del sistema';
+        _passwordError = 'Intentalo nuevamente';
+      });
+      debugPrint('Error general: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _handleAuthError(FirebaseAuthException e) {
+    setState(() {
+      switch (e.code) {
+        case 'user-not-found':
+        case 'invalid-email':
+        case 'invalid-document':
+          _usernameError = 'Usuario no encontrado';
+          _passwordError = null;
+          break;
+        case 'wrong-password':
+          _usernameError = null;
+          _passwordError = 'Contraseña incorrecta';
+          break;
+        case 'too-many-requests':
+          _usernameError = 'Demasiados intentos';
+          _passwordError = 'Cuenta temporalmente bloqueada';
+          break;
+        case 'user-disabled':
+          _usernameError = 'Cuenta deshabilitada';
+          _passwordError = 'Contacta con un administrador';
+          break;
+        case 'firestore-error':
+        case 'timeour':
+          _usernameError = 'Error de conexión';
+          _passwordError = 'Verifique su conexión';
+        default:
+          _usernameError = 'Error de autenticación';
+          _passwordError = 'Verifique sus datos';
       }
     });
     debugPrint('Error de autenticación: ${e.code} - ${e.message}');
@@ -80,115 +135,135 @@ class _LoginState extends State<Login> {
                 ),
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min, // Para que la columna se ajuste al contenido
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    height: 100,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      color: AppStyles.primaryBrown,
-                      borderRadius: BorderRadius.circular(180),
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        'assets/Logo_delipan.png',
-                        width: 60,
-                        height: 75,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      height: 100,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        color: AppStyles.primaryBrown,
+                        borderRadius: BorderRadius.circular(180),
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          'assets/Logo_delipan.png',
+                          width: 60,
+                          height: 75,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                Center(
-                  child: Text(
-                    'Delipan',
-                    style: AppStyles.appTitle.copyWith(
-                      fontSize: 32,
-                      color: AppStyles.primaryBrown,
-                    ),
+                  SizedBox(
+                    height: 3,
                   ),
-                ),
-                SizedBox(
-                  height: 25,
-                ),
-                Text(
-                  'Usuario:',
-                  textAlign: TextAlign.start,
-                  style: AppStyles.bodyText.copyWith(
-                    fontSize: 16,
-                  ),
-                ),
-                TextFormField(
-                  controller: user,
-                  decoration: AppStyles.inputDecoration('Escriba su usuario').copyWith(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    prefixIcon: Align(
-                      widthFactor: 1.0,
-                      heightFactor: 1.0,
-                      child: Icon(
-                        Icons.person,
+                  Center(
+                    child: Text(
+                      'Delipan',
+                      style: AppStyles.appTitle.copyWith(
+                        fontSize: 32,
                         color: AppStyles.primaryBrown,
                       ),
                     ),
-                    errorText: checkUser ? 'Usuario incorrecta' : null,
                   ),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Text(
-                  'Contraseña:',
-                  style: AppStyles.bodyText.copyWith(
-                    fontSize: 16,
+                  SizedBox(
+                    height: 25,
                   ),
-                ),
-                TextFormField(
-                  controller: pass,
-                  obscureText: ocultaPass,
-                  decoration: AppStyles.inputDecoration('Escriba su contraseña').copyWith(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                  Text(
+                    'Usuario:',
+                    textAlign: TextAlign.start,
+                    style: AppStyles.bodyText.copyWith(
+                      fontSize: 16,
                     ),
-                    prefixIcon: Align(
-                      widthFactor: 1.0,
-                      heightFactor: 1.0,
-                      child: Icon(
-                        Icons.key,
-                        color: AppStyles.primaryBrown,
+                  ),
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: AppStyles.inputDecoration('Escriba su usuario').copyWith(
+                        errorText: _usernameError,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        prefixIcon: Align(
+                          widthFactor: 1.0,
+                          heightFactor: 1.0,
+                          child: Icon(
+                            Icons.person,
+                            color: AppStyles.primaryBrown,
+                          ),
+                        ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Ingrese su usuario';
+                      }
+                      if (value.length < 3) {
+                        return 'Mínimo 3 carácteres';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Text(
+                    'Contraseña:',
+                    style: AppStyles.bodyText.copyWith(
+                      fontSize: 16,
+                    ),
+                  ),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _ocultaTexto,
+                    decoration: AppStyles.inputDecoration('Escriba su contraseña').copyWith(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    ),
-                    suffixIcon: IconButton(
+                      prefixIcon: Align(
+                        widthFactor: 1.0,
+                        heightFactor: 1.0,
+                        child: Icon(
+                          Icons.key,
+                          color: AppStyles.primaryBrown,
+                        ),
+                      ),
+                      suffixIcon: IconButton(
                         onPressed: (){
                           setState(() {
-                            ocultaPass = !ocultaPass;
+                            _ocultaTexto = !_ocultaTexto;
                           });
                         },
                         icon: Icon(
-                            ocultaPass ? Icons.visibility : Icons.visibility_off,
+                          _ocultaTexto ? Icons.visibility_off : Icons.visibility,
                           color: AppStyles.primaryBrown,
                         ),
+                      ),
+                      errorText: _passwordError,
                     ),
-                    errorText: checkPass ? 'Contraseña incorrecta' : null,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Ingrese su contraseña';
+                      }
+                      if (value.length < 3) {
+                        return 'Minimo 3 carácteres';
+                      }
+                      return null;
+                    },
                   ),
-                ),
-                SizedBox(
-                  height: 25,
-                ),
-                Center(
-                  child: SizedBox(
-                    width: size.width * 0.55,
-                    child: ElevatedButton(
-                        onPressed: _validaLogin,
-                        style: AppStyles.primaryButtonStyle,
-                        child: Center(
-                          child: Text(
+                  SizedBox(
+                    height: 25,
+                  ),
+                  Center(
+                    child: SizedBox(
+                      width: size.width * 0.55,
+                      child: ElevatedButton(
+                          onPressed: _isLoading ? null : _login,
+                          style: AppStyles.primaryButtonStyle,
+                          child: _isLoading ? CircularProgressIndicator(
+                            color: AppStyles.white) : Text(
                             'INGRESAR',
                             style: AppStyles.bodyText.copyWith(
                               fontWeight: FontWeight.bold,
@@ -196,39 +271,40 @@ class _LoginState extends State<Login> {
                               color: Colors.white,
                             ),
                           ),
+                      ),
+                      ),
+                    ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Center(
+                    child: Text(
+                      '¿No tienes una cuenta?',
+                      style: AppStyles.bodyText.copyWith(
+                          fontSize: 15
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: TextButton(
+                        onPressed: (){
+                          setState(() {
+                            // Código para registrarse
+                            Navigator.of(context).pushReplacementNamed('/registro');
+                          });
+                        },
+                        child: Text(
+                          'REGISTRARSE',
+                          style: AppStyles.bodyText.copyWith(
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                            color: AppStyles.darkGrey,
+                          ),
                         )
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                Center(
-                  child: Text(
-                    '¿No tienes una cuenta?',
-                    style: AppStyles.bodyText.copyWith(
-                      fontSize: 15
-                    ),
-                  ),
-                ),
-                Center(
-                  child: TextButton(
-                      onPressed: (){
-                        setState(() {
-                          // Código para registrarse
-                          Navigator.of(context).pushReplacementNamed('/registro');
-                        });
-                      },
-                      child: Text(
-                        'REGISTRARSE',
-                        style: AppStyles.bodyText.copyWith(
-                          fontSize: 19,
-                          fontWeight: FontWeight.bold,
-                          color: AppStyles.darkGrey,
-                        ),
-                      )),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
