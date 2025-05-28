@@ -2,10 +2,10 @@
 
 Aplicación móvil desarrollada como proyecto educativo para la materia **Fundamentos de Desarrollo Móvil**.
 
-## 📚 Documentación
+## Documentación
 
 - **📖 [Manual de Usuario](doc/ManualUsuario.pdf)** - Guía básica de uso de la aplicación
-- **🎨 [Mockups](doc/Mockups%20delipan.pdf)** - Maquetado inicial del proyecto (Figma).
+- **🎨 [Mockups](doc/Mockups%20delipan.pdf)** - Maquetado inicial del proyecto (Figma)
 
 ## Información Académica
 
@@ -22,7 +22,7 @@ Aplicación móvil desarrollada como proyecto educativo para la materia **Fundam
 
 Delipan es una aplicación móvil desarrollada en Flutter como parte del proyecto final de la materia FDM. Es una aplicación de panadería que permite a los usuarios explorar productos, gestionar un carrito de compras, seleccionar puntos de recogida y realizar pedidos. La aplicación incluye funcionalidades de autenticación, gestión de roles (usuario/administrador) y sincronización en tiempo real con Firebase.
 
-## 📱 Capturas de Pantalla
+## Capturas de Pantalla
 
 ### Pantallas de Usuario
 
